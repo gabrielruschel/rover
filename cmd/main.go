@@ -23,5 +23,5 @@ func main() {
 	defer inputFile.Close()
 
 	logger.Debug("starting navigation")
-	output, err := navigation.NavigateRovers(inputFile, logger)
+	_, err = navigation.NavigateRovers(inputFile, logger)
 }
