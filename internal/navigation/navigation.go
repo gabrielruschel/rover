@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/gabrielruschel/rover/internal/helpers"
+	"github.com/gabrielruschel/rover/internal/rover"
 )
 
 func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err error) {
@@ -24,6 +25,42 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 		return
 	}
 	logger.Debug("parsed upper-right plateau coordinates", slog.Uint64("upperX", upperX), slog.Uint64("upperY", upperY))
+
+	var counter uint64
+	for {
+		// read first line (initial rover position)
+		read := fileScanner.Scan()
+		if !read {
+			err = helpers.CheckScannerError(fileScanner)
+			if err != nil {
+				return
+			}
+
+			// reached end of file
+			break
+		}
+
+		posLine := fileScanner.Text()
+		rov, errRov := rover.NewRover(
+			posLine,
+			logger.With(slog.String("rover", "r"+string(counter))),
+		)
+		if errRov != nil {
+			logger.Error("error while creating rover, skipping", slog.String("err", errRov.Error()))
+			fileScanner.Scan() // ignore instructions for this failed rover
+			continue
+		}
+
+		read = fileScanner.Scan()
+		if !read {
+			err = helpers.CheckScannerError(fileScanner)
+			err = fmt.Errorf("received incomplete rover instructions, quitting; %w", err)
+			return
+		}
+		instLine := fileScanner.Text()
+
+		counter++
+	}
 
 	return
 }
