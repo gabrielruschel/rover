@@ -3,11 +3,13 @@ package config
 const (
 	envInputFile  = "INPUT_FILE"
 	envOutputFile = "OUTPUT_FILE"
+	envLogLevel   = "LOG_LEVEL"
 )
 
 type Config struct {
 	InputFile  string
 	OutputFile string
+	LogLevel   string
 }
 
 func NewConfig() Config {
@@ -19,6 +21,7 @@ func NewConfig() Config {
 	loader := EnvLoader{}
 	loader.GetString(&defaultCfg.InputFile, envInputFile)
 	loader.GetString(&defaultCfg.OutputFile, envOutputFile)
+	loader.GetString(&defaultCfg.LogLevel, envLogLevel)
 
 	return defaultCfg
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -29,7 +30,7 @@ func parsePlateau(coordStr string) (upperX uint64, upperY uint64, err error) {
 	return
 }
 
-func NavigateRovers(input io.Reader) (output []string, err error) {
+func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err error) {
 	fileScanner := bufio.NewScanner(input)
 
 	if !fileScanner.Scan() {
@@ -37,12 +38,13 @@ func NavigateRovers(input io.Reader) (output []string, err error) {
 		return
 	}
 
-	fLine := fileScanner.Text()
-	upperX, upperY, err := parsePlateau(fLine)
+	platLine := fileScanner.Text()
+	upperX, upperY, err := parsePlateau(platLine)
 	if err != nil {
 		err = fmt.Errorf("error while parsing plateau upper coordinates: %w", err)
 		return
 	}
+	logger.Debug("parsed upper-right plateau coordinates", slog.Uint64("upperX", upperX), slog.Uint64("upperY", upperY))
 
 	return
 }

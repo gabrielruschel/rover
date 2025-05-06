@@ -2,24 +2,26 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/gabrielruschel/rover/internal/config"
+	"github.com/gabrielruschel/rover/internal/helpers"
 	"github.com/gabrielruschel/rover/internal/navigation"
 )
 
 func main() {
-	fmt.Println("starting rover!")
-
 	runConfig := config.NewConfig()
-	fmt.Printf("loaded config = %+v\n", runConfig)
+	logger := helpers.NewLogger(runConfig.LogLevel, slog.String("job", "navigator"))
+	logger.Debug("loaded config", slog.Any("config", runConfig))
 
 	inputFile, err := os.Open(runConfig.InputFile)
 	if err != nil {
-		log.Fatalf("unexpected error opening input file %s: %v", runConfig.InputFile, err)
+		logger.Error(fmt.Sprintf("unexpected error opening input file %s: %v", runConfig.InputFile, err))
+		return
 	}
 	defer inputFile.Close()
 
-	output, err := navigation.NavigateRovers(inputFile)
+	logger.Debug("starting navigation")
+	output, err := navigation.NavigateRovers(inputFile, logger)
 }
