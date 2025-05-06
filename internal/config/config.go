@@ -18,7 +18,7 @@ func NewConfig() Config {
 
 	loader := EnvLoader{}
 	loader.GetString(&defaultCfg.InputFile, envInputFile)
-	loader.GetString(&defaultCfg.OutputFile, envInputFile)
+	loader.GetString(&defaultCfg.OutputFile, envOutputFile)
 
 	return defaultCfg
 }
