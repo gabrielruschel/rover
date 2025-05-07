@@ -48,9 +48,6 @@ func TestRotateRover(t *testing.T) {
 			expectedOrient:    North,
 			expectedOrientIdx: OrientationIdx[North],
 		},
-
-		// ---------------------------------------------------------
-
 		{
 			name:              "Test rotate RIGHT from NORTH",
 			direction:         RotateRight,

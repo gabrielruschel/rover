@@ -53,8 +53,12 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 			logger.With(slog.String("rover", fmt.Sprintf("r%d", counter))),
 		)
 		if errRov != nil {
-			logger.Error("error while creating rover, skipping", slog.String("err", errRov.Error()))
-			fileScanner.Scan() // ignore instructions for this failed rover
+			logger.Error(
+				"error while creating rover, skipping",
+				slog.String("err", errRov.Error()),
+				slog.String("rover", fmt.Sprintf("r%d", counter)),
+			)
+			fileScanner.Scan() // read next line, ignore instructions for this failed rover
 			continue
 		}
 

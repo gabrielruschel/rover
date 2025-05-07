@@ -34,7 +34,11 @@ func NewRover(
 		return nil, err
 	}
 
-	logger.Info("created rover", slog.Uint64("X", coordX), slog.Uint64("Y", coordY), slog.Any("orientation", orientation))
+	logger.Info(
+		"created rover",
+		slog.Uint64("X", coordX), slog.Uint64("Y", coordY),
+		slog.String("orientation", fmt.Sprintf("%c", orientation)),
+	)
 
 	return &Rover{
 		XCoord:         coordX,
@@ -53,12 +57,12 @@ func (r *Rover) ExecuteRoverNavigation(
 ) (uint64, uint64) {
 	for _, inst := range instStr {
 		inst = unicode.ToUpper(inst)
-		r.logger.Debug("executing instruction", slog.Any("instruction", inst))
+		r.logger.Debug("executing instruction", slog.String("instruction", fmt.Sprintf("%c", inst)))
 
 		switch inst {
 		case RotateLeft, RotateRight:
 			r.rotateRover(inst)
-			r.logger.Info("rotated rover", slog.Any("orientation", r.Orientation))
+			r.logger.Info("rotated rover", slog.String("orientation", fmt.Sprintf("%c", r.Orientation)))
 		case Move:
 			err := r.moveRover(deployedRovers)
 			if err != nil {
@@ -67,7 +71,7 @@ func (r *Rover) ExecuteRoverNavigation(
 			}
 			r.logger.Info("moved rover to position", slog.Uint64("X", r.XCoord), slog.Uint64("Y", r.YCoord))
 		default:
-			r.logger.Warn("invalid instruction, skipping", slog.Any("instruction", inst))
+			r.logger.Warn("invalid instruction, skipping", slog.String("instruction", fmt.Sprintf("%c", inst)))
 		}
 	}
 
