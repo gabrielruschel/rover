@@ -3,53 +3,8 @@ package rover
 import (
 	"fmt"
 	"log/slog"
-	"strings"
 	"unicode"
-
-	"github.com/gabrielruschel/rover/internal/helpers"
 )
-
-func parseRoverPosition(
-	posStr string, upperX, upperY uint64,
-) (
-	coordX, coordY uint64,
-	orientation rune, err error,
-) {
-	split := strings.Split(posStr, " ")
-	if len(split) != 3 {
-		err = fmt.Errorf("could not parse rover position, not enough info")
-		return
-	}
-
-	coordX, coordY, err = helpers.ParseCoordinates(strings.Join(split[:2], " "))
-	if err != nil {
-		err = fmt.Errorf("could not parse rover position: %w", err)
-		return
-	}
-
-	if coordX < 0 || coordY < 0 || coordX > upperX || coordY > upperY {
-		err = fmt.Errorf("cannot place rover in position (%d,%d): out of bounds", coordX, coordY)
-		return
-	}
-
-	orientRunes := []rune(split[2])
-	if len(orientRunes) == 0 {
-		err = fmt.Errorf("could not parse rover position orientation")
-		return
-	}
-	orientation = unicode.ToUpper(orientRunes[0])
-
-	switch orientation {
-	case North:
-	case South:
-	case East:
-	case West:
-	default:
-		err = fmt.Errorf("invalid orientation [%c]", orientation)
-	}
-
-	return
-}
 
 type Rover struct {
 	XCoord         uint64
@@ -66,9 +21,15 @@ type Rover struct {
 func NewRover(
 	posStr string,
 	upperX, upperY uint64,
+	deployedRovers [][2]uint64,
 	logger *slog.Logger,
 ) (*Rover, error) {
-	coordX, coordY, orientation, err := parseRoverPosition(posStr, upperX, upperY)
+	coordX, coordY, orientation, err := parseRoverPosition(posStr)
+	if err != nil {
+		return nil, err
+	}
+
+	err = validateDestination(coordX, coordY, upperX, upperY, deployedRovers)
 	if err != nil {
 		return nil, err
 	}
@@ -143,30 +104,11 @@ func (r *Rover) moveRover(deployedRovers [][2]uint64) (err error) {
 		newX--
 	}
 
-	err = r.validateDestination(newX, newY, deployedRovers)
+	err = validateDestination(newX, newY, r.upperX, r.upperY, deployedRovers)
 	if err != nil {
 		return
 	}
 
 	r.XCoord, r.YCoord = newX, newY
-	return
-}
-
-func (r Rover) validateDestination(
-	newX, newY uint64,
-	deployedRovers [][2]uint64,
-) (err error) {
-	if newX < 0 || newY < 0 || newX > r.upperX || newY > r.upperY {
-		err = fmt.Errorf("cannot move rover to (%d,%d): invalid position, out of bounds", newX, newY)
-		return
-	}
-
-	for i, dr := range deployedRovers {
-		if newX == dr[0] && newY == dr[1] {
-			err = fmt.Errorf("cannot move rover to (%d,%d): invalid position, already occupied by rover r%d", newX, newY, i)
-			break
-		}
-	}
-
 	return
 }

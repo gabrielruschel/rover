@@ -49,6 +49,7 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 		rov, errRov := rover.NewRover(
 			posLine,
 			upperX, upperY,
+			deployedRovers,
 			logger.With(slog.String("rover", fmt.Sprintf("r%d", counter))),
 		)
 		if errRov != nil {
