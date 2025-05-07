@@ -39,7 +39,7 @@ func parseRoverPosition(posStr string) (
 		return
 	}
 
-	coordX, coordY, err = helpers.ParseCoordinates(strings.Join(split[:2], " "))
+	coordX, coordY, err = helpers.ParseUint64Coordinates(strings.Join(split[:2], " "))
 	if err != nil {
 		err = fmt.Errorf("could not parse rover position: %w", err)
 		return

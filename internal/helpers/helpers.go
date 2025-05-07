@@ -25,7 +25,7 @@ func NewLogger(level string, attrs ...any) *slog.Logger {
 	return slog.New(slog.NewJSONHandler(os.Stdout, opts)).With(attrs...)
 }
 
-func ParseCoordinates(coordStr string) (upperX uint64, upperY uint64, err error) {
+func ParseUint64Coordinates(coordStr string) (upperX uint64, upperY uint64, err error) {
 	splitStr := strings.Split(coordStr, " ")
 	if len(splitStr) < 2 {
 		err = fmt.Errorf("could not parse coordinates, not enough info")

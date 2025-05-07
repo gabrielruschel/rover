@@ -40,7 +40,7 @@ func TestParsePlateau(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			uppX, uppY, err := ParseCoordinates(tc.coordStr)
+			uppX, uppY, err := ParseUint64Coordinates(tc.coordStr)
 			if tc.err {
 				assert.Error(t, err)
 				return

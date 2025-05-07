@@ -16,6 +16,7 @@ func NewConfig() Config {
 	defaultCfg := Config{
 		InputFile:  "input.txt",
 		OutputFile: "output.txt",
+		LogLevel:   "ERROR",
 	}
 
 	loader := EnvLoader{}

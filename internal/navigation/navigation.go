@@ -20,7 +20,7 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 	}
 
 	platLine := fileScanner.Text()
-	upperX, upperY, err := helpers.ParseCoordinates(platLine)
+	upperX, upperY, err := helpers.ParseUint64Coordinates(platLine)
 	if err != nil {
 		err = fmt.Errorf("error while parsing plateau upper coordinates: %w", err)
 		return
@@ -58,16 +58,20 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 			continue
 		}
 
+		// read second line (rover navigation instructions)
 		read = fileScanner.Scan()
 		if !read {
 			err = helpers.CheckScannerError(fileScanner)
-			err = fmt.Errorf("received incomplete rover instructions, quitting; %w", err)
-			return
+			if err != nil {
+				return
+			}
+			logger.Warn("did not receive instructions for rover")
 		}
 		instLine := fileScanner.Text()
 
 		finalPosX, finalPosY := rov.ExecuteRoverNavigation(instLine, deployedRovers)
 		deployedRovers = append(deployedRovers, [2]uint64{finalPosX, finalPosY})
+		output = append(output, fmt.Sprintf("%d %d %c", finalPosX, finalPosY, rov.Orientation))
 
 		counter++
 	}
