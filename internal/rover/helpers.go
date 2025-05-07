@@ -14,8 +14,9 @@ const (
 	East  = 'E'
 	West  = 'W'
 
-	Left  = 'L'
-	Right = 'R'
+	RotateLeft  = 'L'
+	RotateRight = 'R'
+	Move        = 'M'
 )
 
 var (
@@ -68,7 +69,7 @@ func validateDestination(
 	upperX, upperY uint64,
 	deployedRovers [][2]uint64,
 ) (err error) {
-	if newX < 0 || newY < 0 || newX > upperX || newY > upperY {
+	if newX > upperX || newY > upperY {
 		err = fmt.Errorf("cannot move rover to (%d,%d): invalid position, out of bounds", newX, newY)
 		return
 	}

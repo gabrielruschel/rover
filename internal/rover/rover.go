@@ -56,10 +56,10 @@ func (r *Rover) ExecuteRoverNavigation(
 		r.logger.Debug("executing instruction", slog.Any("instruction", inst))
 
 		switch inst {
-		case Left, Right:
+		case RotateLeft, RotateRight:
 			r.rotateRover(inst)
 			r.logger.Info("rotated rover", slog.Any("orientation", r.Orientation))
-		case 'M':
+		case Move:
 			err := r.moveRover(deployedRovers)
 			if err != nil {
 				r.logger.Warn(err.Error())
@@ -77,12 +77,12 @@ func (r *Rover) ExecuteRoverNavigation(
 
 func (r *Rover) rotateRover(direction rune) {
 	switch direction {
-	case Left:
+	case RotateLeft:
 		r.orientationIdx--
 		if r.orientationIdx < 0 {
 			r.orientationIdx = len(Orientations) - 1
 		}
-	case Right:
+	case RotateRight:
 		r.orientationIdx++
 		if r.orientationIdx > len(Orientations)-1 {
 			r.orientationIdx = 0
@@ -93,14 +93,34 @@ func (r *Rover) rotateRover(direction rune) {
 
 func (r *Rover) moveRover(deployedRovers [][2]uint64) (err error) {
 	newX, newY := r.XCoord, r.YCoord
+
+	// treating each corner case individually to avoid problems with uint64 overflow
 	switch r.Orientation {
 	case North:
 		newY++
+		// uint64 overflow comes back to 0
+		if newY == 0 {
+			err = fmt.Errorf("cannot move rover to (%d,%d): invalid position, out of bounds", newX, newY)
+			return
+		}
 	case South:
+		if r.YCoord == 0 {
+			err = fmt.Errorf("cannot move rover to (%d,-1): invalid position, out of bounds", newX)
+			return
+		}
 		newY--
 	case East:
 		newX++
+		// uint64 overflow comes back to 0
+		if newX == 0 {
+			err = fmt.Errorf("cannot move rover to (%d,%d): invalid position, out of bounds", newX, newY)
+			return
+		}
 	case West:
+		if r.XCoord == 0 {
+			err = fmt.Errorf("cannot move rover to (-1,%d): invalid position, out of bounds", newY)
+			return
+		}
 		newX--
 	}
 
