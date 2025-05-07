@@ -13,6 +13,7 @@ import (
 func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err error) {
 	fileScanner := bufio.NewScanner(input)
 
+	// read file first line (plateau upper coordinates)
 	if !fileScanner.Scan() {
 		err = fmt.Errorf("could not read first line of input file: %v", fileScanner.Err())
 		return
@@ -26,7 +27,11 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 	}
 	logger.Debug("parsed upper-right plateau coordinates", slog.Uint64("upperX", upperX), slog.Uint64("upperY", upperY))
 
-	var counter uint64
+	var (
+		counter        uint64
+		deployedRovers = make([][2]uint64, 0, int(upperX))
+	)
+
 	for {
 		// read first line (initial rover position)
 		read := fileScanner.Scan()
@@ -43,7 +48,8 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 		posLine := fileScanner.Text()
 		rov, errRov := rover.NewRover(
 			posLine,
-			logger.With(slog.String("rover", "r"+string(counter))),
+			upperX, upperY,
+			logger.With(slog.String("rover", fmt.Sprintf("r%d", counter))),
 		)
 		if errRov != nil {
 			logger.Error("error while creating rover, skipping", slog.String("err", errRov.Error()))
@@ -58,6 +64,9 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 			return
 		}
 		instLine := fileScanner.Text()
+
+		finalPosX, finalPosY := rov.ExecuteRoverNavigation(instLine, deployedRovers)
+		deployedRovers = append(deployedRovers, [2]uint64{finalPosX, finalPosY})
 
 		counter++
 	}
