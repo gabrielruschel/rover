@@ -13,19 +13,19 @@ func parseRoverPosition(posStr string) (
 	coordX uint64, coordY uint64,
 	orientation rune, err error,
 ) {
-	split := strings.SplitN(posStr, " ", 2)
-	if len(split) != 2 {
+	split := strings.Split(posStr, " ")
+	if len(split) != 3 {
 		err = fmt.Errorf("could not parse rover position, not enough info")
 		return
 	}
 
-	coordX, coordY, err = helpers.ParseCoordinates(split[0])
+	coordX, coordY, err = helpers.ParseCoordinates(strings.Join(split[:2], " "))
 	if err != nil {
 		err = fmt.Errorf("could not parse rover position: %w", err)
 		return
 	}
 
-	orientRunes := []rune(split[1])
+	orientRunes := []rune(split[2])
 	if len(orientRunes) == 0 {
 		err = fmt.Errorf("could not parse rover position orientation")
 		return
@@ -58,10 +58,15 @@ func NewRover(posStr string, logger *slog.Logger) (*Rover, error) {
 		return nil, err
 	}
 
+	logger.Info("created rover", slog.Uint64("X", coordX), slog.Uint64("Y", coordY), slog.Any("orientation", orientation))
+
 	return &Rover{
 		XCoord:      coordX,
 		YCoord:      coordY,
 		Orientation: orientation,
 		logger:      logger,
 	}, nil
+}
+
+func (r Rover) ExecuteRoverNavigation(instStr string) {
 }
