@@ -75,7 +75,6 @@ func (r *Rover) ExecuteRoverNavigation(
 		}
 	}
 
-	fmt.Printf("%d %d %c\n", r.XCoord, r.YCoord, r.Orientation)
 	return r.XCoord, r.YCoord
 }
 

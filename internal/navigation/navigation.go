@@ -75,7 +75,10 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 
 		finalPosX, finalPosY := rov.ExecuteRoverNavigation(instLine, deployedRovers)
 		deployedRovers = append(deployedRovers, [2]uint64{finalPosX, finalPosY})
-		output = append(output, fmt.Sprintf("%d %d %c", finalPosX, finalPosY, rov.Orientation))
+
+		finalPos := fmt.Sprintf("%d %d %c", finalPosX, finalPosY, rov.Orientation)
+		fmt.Println(finalPos)
+		output = append(output, finalPos)
 
 		counter++
 	}
