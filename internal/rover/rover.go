@@ -69,7 +69,11 @@ func (r *Rover) ExecuteRoverNavigation(
 				r.logger.Warn(err.Error())
 				continue
 			}
-			r.logger.Info("moved rover to position", slog.Uint64("X", r.XCoord), slog.Uint64("Y", r.YCoord))
+			r.logger.Info(
+				"moved rover to position",
+				slog.Uint64("X", r.XCoord), slog.Uint64("Y", r.YCoord),
+				slog.String("orientation", fmt.Sprintf("%c", r.Orientation)),
+			)
 		default:
 			r.logger.Warn("invalid instruction, skipping", slog.String("instruction", fmt.Sprintf("%c", inst)))
 		}

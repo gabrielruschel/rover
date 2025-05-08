@@ -25,7 +25,10 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 		err = fmt.Errorf("error while parsing plateau upper coordinates: %w", err)
 		return
 	}
-	logger.Debug("parsed upper-right plateau coordinates", slog.Uint64("upperX", upperX), slog.Uint64("upperY", upperY))
+	logger.Debug(
+		"parsed upper-right plateau coordinates",
+		slog.Uint64("upperX", upperX), slog.Uint64("upperY", upperY),
+	)
 
 	var (
 		counter        uint64
@@ -74,6 +77,8 @@ func NavigateRovers(input io.Reader, logger *slog.Logger) (output []string, err 
 		instLine := fileScanner.Text()
 
 		finalPosX, finalPosY := rov.ExecuteRoverNavigation(instLine, deployedRovers)
+
+		// keep track of every deployed rover
 		deployedRovers = append(deployedRovers, [2]uint64{finalPosX, finalPosY})
 
 		finalPos := fmt.Sprintf("%d %d %c", finalPosX, finalPosY, rov.Orientation)

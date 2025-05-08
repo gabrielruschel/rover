@@ -11,6 +11,7 @@ func TestNewConfig(t *testing.T) {
 		name       string
 		inputFile  string
 		outputFile string
+		logLevel   string
 		expected   Config
 	}{
 		{
@@ -20,6 +21,7 @@ func TestNewConfig(t *testing.T) {
 			expected: Config{
 				InputFile:  "input.txt",
 				OutputFile: "output.txt",
+				LogLevel:   "ERROR",
 			},
 		},
 		{
@@ -29,6 +31,7 @@ func TestNewConfig(t *testing.T) {
 			expected: Config{
 				InputFile:  "new_input.txt",
 				OutputFile: "output.txt",
+				LogLevel:   "ERROR",
 			},
 		},
 		{
@@ -38,6 +41,18 @@ func TestNewConfig(t *testing.T) {
 			expected: Config{
 				InputFile:  "input.txt",
 				OutputFile: "new_output.txt",
+				LogLevel:   "ERROR",
+			},
+		},
+		{
+			name:       "Test custom log level",
+			inputFile:  "",
+			outputFile: "",
+			logLevel:   "DEBUG",
+			expected: Config{
+				InputFile:  "input.txt",
+				OutputFile: "output.txt",
+				LogLevel:   "DEBUG",
 			},
 		},
 	}
@@ -50,6 +65,10 @@ func TestNewConfig(t *testing.T) {
 
 			if tc.outputFile != "" {
 				t.Setenv(envOutputFile, tc.outputFile)
+			}
+
+			if tc.logLevel != "" {
+				t.Setenv(envLogLevel, tc.logLevel)
 			}
 
 			cfg := NewConfig()
